@@ -1,12 +1,10 @@
 package fr.ismailkoksal.kotlin_iss
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ArrayAdapter
-import androidx.room.Room
+import androidx.appcompat.app.AppCompatActivity
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import fr.ismailkoksal.kotlin_iss.entities.Astro
-import fr.ismailkoksal.kotlin_iss.models.IssLocation
 import fr.ismailkoksal.kotlin_iss.models.PeopleInSpace
 import fr.ismailkoksal.kotlin_iss.models.Person
 import fr.ismailkoksal.kotlin_iss.services.IssService
@@ -14,7 +12,6 @@ import kotlinx.android.synthetic.main.activity_people_in_space.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.internal.wait
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -38,13 +35,15 @@ class PeopleInSpaceActivity : AppCompatActivity() {
         initAstros().invokeOnCompletion {
             println(astros)
 
-            val listItems = arrayOfNulls<String>(astros.size)
-            for (i in astros.indices) {
-                val astro = astros[i]
-                listItems[i] = astro.name
+            runOnUiThread {
+                val listItems = arrayOfNulls<String>(astros.size)
+                for (i in astros.indices) {
+                    val astro = astros[i]
+                    listItems[i] = astro.name
+                }
+                val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, listItems)
+                astros_list_view.adapter = adapter
             }
-            val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, listItems)
-            astros_list_view.adapter = adapter
         }
     }
 
@@ -53,7 +52,7 @@ class PeopleInSpaceActivity : AppCompatActivity() {
             astros = DataInterface.getAll(this@PeopleInSpaceActivity)
             if (astros.isNullOrEmpty()) {
                 fetchAstros()
-                delay(10000)
+                delay(5000)
             }
         }
     }
